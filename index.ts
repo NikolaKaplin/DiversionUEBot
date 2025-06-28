@@ -24,7 +24,7 @@ export class CustomContext extends Context {
   user: User;
 }
 
-export const dv = new DiversionClient(process.env.DV_API_TOKEN)
+export const dv = new DiversionClient(process.env.DV_API_TOKEN);
 
 const startBot = () => {
   const token = env.TELEGRAM_BOT_TOKEN;
@@ -32,7 +32,7 @@ const startBot = () => {
     contextType: CustomContext,
   });
 
-  bot.use(async (ctx, next) => { 
+  bot.use(async (ctx, next) => {
     const isValid = await dv.testAuth();
     if (!isValid) await ctx.reply("Invalit auth token, update your token");
     ctx.router = new BotRouter(

@@ -7,16 +7,15 @@ const route = new RouteConfig<CustomContext>({
     const router = ctx.router.validate(route);
     if (!router) return;
     const lastMessageId: number | undefined = (ctx as any)?.callbackQuery?.id;
-    console.log("lastMessageId: "), lastMessageId
+    console.log("lastMessageId: "), lastMessageId;
     if (lastMessageId) {
-      ctx.reply("хуй")
+      ctx.reply("хуй");
     } else {
-      ctx.reply("хуй")
+      ctx.reply("хуй");
     }
   },
 });
 
 export default route;
 
-bot.on(message('text'), async (ctx) => {
-})
+bot.on(message("text"), async (ctx) => {});
