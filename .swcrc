@@ -1,0 +1,17 @@
+{
+    "$schema": "https://swc.rs/schema.json",
+    "test": ".*\\.ts$",
+    "jsc": {
+      "target": "esnext",
+      "parser": {
+        "syntax": "typescript",
+        "tsx": false,
+        "decorators": true,
+        "dynamicImport": true
+      }
+    },
+    "module": {
+      "type": "commonjs"
+    },
+    "exclude": [".*node_modules.*"]
+}
