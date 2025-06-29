@@ -1,11 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2016",
-    "module": "CommonJS",
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": false,
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "NodeNext",
     "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,                      
+    "noImplicitAny": true,               
+    "strictNullChecks": false,           
+    "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-  }
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSourceMap": false,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.test.ts"],
 }

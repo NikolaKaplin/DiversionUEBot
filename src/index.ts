@@ -16,15 +16,15 @@ const routing = new BotRouting();
 
 export class CustomContext extends Context {
   getUserData(): UserData {
-    if (!usersData.has(this.from.id))
-      usersData.set(this.from.id, { currentBotPath: "/" });
-    return usersData.get(this.from.id);
+    if (!usersData.has(this.from!.id))
+      usersData.set(this.from!.id, { currentBotPath: "/" });
+    return usersData.get(this.from!.id)!;
   }
   router = new BotRouter(this, routing, "/", () => {});
-  user: User;
+  user: User | undefined;
 }
 
-export const dv = new DiversionClient(process.env.DV_API_TOKEN);
+export const dv = new DiversionClient(process.env.DV_API_TOKEN!);
 
 const startBot = () => {
   const token = env.TELEGRAM_BOT_TOKEN;
@@ -56,11 +56,11 @@ const startBot = () => {
     await next();
   });
 
-  globalThis.bot = bot;
+  (globalThis as any).bot = bot;
   return bot;
 };
 
-const bot = (() => (globalThis.bot as Telegraf<CustomContext>) || startBot())();
+const bot = (() => ((globalThis as any).bot as Telegraf<CustomContext>) || startBot())();
 export default bot;
 
 const routingInitializing = routing.initialize(path.join(__dirname, "./bot"));
