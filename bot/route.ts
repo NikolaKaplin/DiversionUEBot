@@ -9,13 +9,13 @@ const route = new RouteConfig<CustomContext>({
     const lastMessageId: number | undefined = (ctx as any)?.callbackQuery?.id;
     console.log("lastMessageId: "), lastMessageId;
     if (lastMessageId) {
-      ctx.reply("хуй");
+      ctx.reply("test");
     } else {
-      ctx.reply("хуй");
+      ctx.reply("test");
     }
   },
 });
 
 export default route;
 
-bot.on(message("text"), async (ctx) => {});
+bot.on(message("text"), async (ctx) => { });

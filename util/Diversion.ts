@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, HttpStatusCode, Method } from "axios";
-import { DVListCommitsQueryParams, DVListCommits, DVCommit } from "../types/RepositoryCommitManipulation";
+import { DVListCommitsQueryParams, DVListCommits, DVCommit, DVCommitChangesCount, DVCommitWorkspaceRes, DVCommitWorkspaceReq, DVCommiRevertReq, DVCommiRevertTo } from "../types/RepositoryCommitManipulation";
 import { BillingSucces } from "../types/Account";
 import { Default } from "../types/Default";
 import {
@@ -8,11 +8,11 @@ import {
 } from "../types/ContentGeneration";
 import { CreateRepo, ListRepo, RepoInfo } from "../types/RepositoryManagement";
 import { DVfileHistory, DVFileHistoryParams, DVFileQueryParams, DVTreeContentStream, DVFileTree, ImportRepo, DVFileEntry } from "../types/RepositoryManipulation";
-import { Success } from "../types/Success";
+import { DVCustomRes, Success } from "../types/Response";
 
 export class DiversionClient {
-  private baseUrl = "https://api.diversion.dev/v0";
-  private apiToken: string;
+  private readonly baseUrl = "https://api.diversion.dev/v0";
+  private readonly apiToken: string;
 
   constructor(apiToken: string) {
     this.apiToken = apiToken;
@@ -37,20 +37,21 @@ export class DiversionClient {
     REPO_LIST_COMMITS: "/repos/{repo_id}/commits",
     REPO_COMMITS_BULK: "/repos/{repo_id}/commits/bulk",
     REPO_COMMITS_DETAILS: "/repos/{repo_id}/commits/{commit_id}",
+    REPO_COMMIT_COUNT_CHANGES: "/repos/{repo_id}/commits/{commit_id}/count_changes",
+    REPO_COMMIT_WORKSPACE: "/repos/{repo_id}/workspaces/{workspace_id}/commit",
+    REPO_COMMIT_REVERT: "/repos/{repo_id}/revert",
+    REPO_COMMIT_REVERT_TO: "/repos/{repo_id}/revert_to_commit_workspace",
   };
 
   private createUrl(url: string, ...args: string[]) {
-    let editedUrl = url;
-    for (let i = 0; i < args.length; i++) {
-      editedUrl.replace(/\{[^}]*\}/, args[i]);
-    }
-    return editedUrl;
+    return args.reduce((acc, arg) => acc.replace(/\{[^}]*\}/, arg), url);
   }
 
   private async request(method: Method, path: string, config?: { header?: object; params?: object; data?: object; }
   ) {
     const options: AxiosRequestConfig = {
       method: method,
+      validateStatus: () => true,
       url: this.baseUrl + path,
       headers: {
         Authorization: `Bearer ${this.apiToken}`,
@@ -185,7 +186,26 @@ export class DiversionClient {
         const url = this.createUrl(this.PATHS.REPO_COMMITS_BULK, repoId, commitId);
         const updateMessageCommitsRepo = await this.request("PATCH", url, { header: { 'Content-Type': 'application/json' }, data: { commit_message: commitMessage } })
         return updateMessageCommitsRepo.data
-      }
+      },
+      countChanges: async (repoId: string, commitId: string): Promise<DVCommitChangesCount> => {
+        const url = this.createUrl(this.PATHS.REPO_COMMIT_COUNT_CHANGES, repoId, commitId);
+        const countChangesCommitsRepo = await this.request("GET", url);
+        return countChangesCommitsRepo.data
+      },
+      commitWorkspace: async (repoId: string, workspaceId: string, data: DVCommitWorkspaceReq): Promise<{ message: string } | DVCommitWorkspaceRes> => {
+        const url = this.createUrl(this.PATHS.REPO_COMMIT_WORKSPACE, repoId, workspaceId);
+        const commitWorkspaceCommitsRepo = await this.request("POST", url, { data });
+        return commitWorkspaceCommitsRepo.status === HttpStatusCode.Ok ? { message: "Workspace contains no changes to commit" } : commitWorkspaceCommitsRepo.data
+      },
+      revert: async (repoId: string, params: DVCommiRevertReq): Promise<DVCustomRes | Default> => {
+        const url = this.createUrl(this.PATHS.REPO_COMMIT_REVERT, repoId);
+        const revertCommitsRepo = await this.request("POST", url, { params });
+        return revertCommitsRepo.status === HttpStatusCode.Ok ? { code: revertCommitsRepo.status, message: "The revert was empty" } : revertCommitsRepo.status === HttpStatusCode.Created ? { code: revertCommitsRepo.status, message: "The revert was completed successfully" } : revertCommitsRepo.status === HttpStatusCode.Accepted ? revertCommitsRepo.data : revertCommitsRepo.data;
+      },
+      // revertTo: async (repoId: string, params: DVCommiRevertTo): Promise<DVCustomRes> => {
+      //   const url = this.createUrl(this.PATHS.REPO_COMMIT_REVERT_TO, repoId);
+      //   const revertToCommitsRepo = await this.request("POST", url, { params });
+      // }
     }
   };
 }

@@ -20,3 +20,33 @@ export interface DVListCommitsQueryParams {
   skip?: number,
   query?: string,
 }
+
+export type DVCommitChangesCount = {
+  changesCount: number
+}
+
+export type DVCommitWorkspaceReq = {
+  commitMessage: string,
+  includePaths?: string[] | null
+}
+
+export type DVCommitWorkspaceRes = {
+  id: number,
+  readOnly: boolean,
+  failedPaths: string[] | null
+}
+
+export type DVCommiRevertReq = {
+  baseId: string,
+  revertRefId: string,
+}
+
+export type DVCommiRevertRes = {
+  mergeId: string,
+}
+
+export type DVCommiRevertTo = {
+  workspaceId: string,
+  commitId: string,
+}
+
